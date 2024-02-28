@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:minimal_social_media_app/helper/helper_function.dart';
 
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -20,6 +22,37 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  void registerUser() async {
+    showDialog(
+        context: context,
+        builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ));
+
+    // Kiểm tra xem password và confirm password có giống nhau không
+    if (widget.passwordcontroller.text !=
+        widget.confirmpasswordcontroller.text) {
+      // Load vòng tròn
+      Navigator.pop(context);
+      displayMessageToUser("Password doest not correct ", context);
+      return;
+    } else {
+      // try catch việc tạo mới user
+      try {
+        // code tạo mới user
+
+        UserCredential? userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+                email: widget.emailcontroller.text,
+                password: widget.passwordcontroller.text);
+        Navigator.pop(context);
+      } on FirebaseAuthException catch (e) {
+        Navigator.pop(context);
+        displayMessageToUser(e.code, context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   MyTextField(
                       hintText: "Username",
                       obscureText: false,
-                      controller: widget.emailcontroller),
+                      controller: widget.usernamecontroller),
 
                   const SizedBox(
                     height: 10,
@@ -99,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 20,
                   ),
 
-                  MyButton(text: "Register", onPressed: () {}),
+                  MyButton(text: "Register", onPressed: registerUser),
 
                   const SizedBox(
                     height: 20,

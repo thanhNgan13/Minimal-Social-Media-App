@@ -1,6 +1,10 @@
+import 'dart:ffi';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:minimal_social_media_app/components/my_button.dart';
 import 'package:minimal_social_media_app/components/my_textfield.dart';
+import 'package:minimal_social_media_app/helper/helper_function.dart';
 
 class LoginPage extends StatefulWidget {
   // sự kiện khi nhấn nút đăng ki
@@ -17,6 +21,24 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  void login() async {
+    showDialog(
+        context: context,
+        builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ));
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: widget.emailcontroller.text,
+          password: widget.passwordcontroller.text);
+
+      if (context.mounted) Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      displayMessageToUser(e.code, context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
 
-                MyButton(text: "Login", onPressed: () {}),
+                MyButton(text: "Login", onPressed: login),
 
                 const SizedBox(
                   height: 20,
