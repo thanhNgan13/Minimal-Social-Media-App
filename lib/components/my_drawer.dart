@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:minimal_social_media_app/auth/auth.dart';
+import 'package:minimal_social_media_app/controllers/user_controller.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
@@ -11,7 +13,7 @@ class _MyDrawerState extends State<MyDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       child:
           Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Column(
@@ -26,13 +28,21 @@ class _MyDrawerState extends State<MyDrawer> {
             myCustomListTileForDrawer(context, "U S E R S", Icons.group),
           ],
         ),
-        myCustomListTileForDrawer(context, "L O G O U T", Icons.home),
+        myCustomListTileForDrawer(context, "L O G O U T", Icons.logout,
+            onTap: () async {
+          await UserController.logout();
+          if (mounted) {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const AuthPage()));
+          }
+        }),
       ]),
     );
   }
 
   Padding myCustomListTileForDrawer(
-      BuildContext context, String titlte, IconData icon) {
+      BuildContext context, String tittle, IconData icon,
+      {Function()? onTap}) {
     return Padding(
       padding: const EdgeInsets.only(left: 25.0),
       child: ListTile(
@@ -40,10 +50,8 @@ class _MyDrawerState extends State<MyDrawer> {
           icon,
           color: Theme.of(context).colorScheme.inversePrimary,
         ),
-        title: Text(titlte),
-        onTap: () {
-          Navigator.pop(context);
-        },
+        title: Text(tittle),
+        onTap: onTap,
       ),
     );
   }
